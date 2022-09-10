@@ -1,0 +1,12 @@
+[Unit]
+Description=Scraper Listener service
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=20
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+User=<Your Username>
+ExecStart=<python> ../path/to/applications/../main.py
