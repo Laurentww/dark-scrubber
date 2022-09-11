@@ -119,6 +119,9 @@ class TemplateScraper(Scraper):
         #  * Handling of scraped site data *  #
         #######################################
 
+        # for site_data_i in _site_data_cur:
+        #     diff_html = self.mailer._get_diff_html(old_str, new_str)
+
         mailer_args = ()
         mailer_kwargs = {}
         self.mailer.send_update(url, *mailer_args, **mailer_kwargs)

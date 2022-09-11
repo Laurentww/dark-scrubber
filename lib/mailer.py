@@ -1,13 +1,14 @@
 
 from abc import ABC, abstractmethod
+from difflib import ndiff
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate, formataddr
 from io import BytesIO
 from smtplib import SMTP
-from typing import Union
 from textwrap import dedent
+from typing import Union
 from urllib.parse import urlsplit, urlparse
 # from urllib.request import urlopen
 from warnings import filterwarnings
@@ -33,6 +34,11 @@ class Mailer(ABC):
     quality_val: int = 90
 
     resize_img_width: int = 0
+
+    _color_dict = {'-': 'red', '+': 'green'}
+    # _color_dict = {'+': 'red', '-': 'green'}
+    _color_dict_reversed = {value: key for key, value in _color_dict.items()}
+    _color_hex_map = {'green': '#02b539', 'red': '#f05e32'}
 
     # Placeholders
     url: str = None
@@ -170,6 +176,40 @@ class Mailer(ABC):
         return img.resize(
             (img_width, int(img.size[1] * (img_width / img.size[0]))), Image.LANCZOS
         )
+
+    def _parse_color(self, i, s, diff_res, color_str, color_bg=True):
+        color_str = self._color_dict[color_str]
+        color_sign = self._color_dict_reversed[color_str]
+
+        color_change_str = 'style="background-color:' if color_bg else 'color="'
+        color_hex = self._color_hex_map[color_str] if color_bg else color_str
+
+        # start and end of list edge cases
+        if i == 0:
+            return f'<font {color_change_str}{color_hex}">' + s
+        elif i + 1 == len(diff_res):
+            return s + '</font>'
+
+        elif diff_res[i - 1][0] != color_sign and diff_res[i + 1][0] == color_sign:
+            return f'<font {color_change_str}{color_hex}">' + s
+        elif diff_res[i + 1][0] != color_sign:
+            return s + '</font>'
+
+        return s
+
+    def _get_diff_html(self, old_str, new_str):
+        """ Returns html text of the difference between `old_str` and `new_str`.
+        New parts are marked in green and removed parts in red.
+        """
+        html_diff = ''
+        diff = [i for i in ndiff(old_str, new_str)]
+        for i, s in enumerate(diff):
+            diff_i = s[-1] if s[0] == ' ' else self._parse_color(i, s[-1], diff, s[0])
+            html_diff += diff_i
+
+        html_diff = html_diff.strip().strip('\n').strip()
+
+        return html_diff
 
 
 def ensure_short_url(url):
