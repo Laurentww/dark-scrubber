@@ -19,13 +19,13 @@ Template files and instructions for facilitating the creation of custom scrapers
 3) Change the pre-supplied runtime configuration in `Config` to your needs.
 
 
-4) Define how the browser obtains the text, and possible images, to be scraped in `Browser._check_update_of_url()`. Code section [here](/applications/template/browser.py#L26-L29).
+4) Define how the browser obtains the text, and possible images, to be scraped in `Browser._check_update_of_url()`. Code section [here](/applications/template/browser.py#L27-L32).
 
 
-5) Define how the main scraper class passes the scraped data from the browser to the mailer class in `TemplateScraper._check_update_of_url()`. Code section [here](/applications/template/main.py#L124-L126). 
+5) Define how the main scraper class passes the scraped data from the browser to the mailer class in `TemplateScraper._check_update_of_url()`. Code section [here](/applications/template/main.py#L122-L127). 
 
 
-6) Define how the mailer creates the email body from the received data in `Mailer._make_msg()`. Code section [here](/applications/template/mailer.py#L34-L35).
+6) Define how the mailer creates the email body from the received data in `Mailer._make_msg()`. Code section [here](/applications/template/mailer.py#L34-L37).
 
 
 7) Run the [/template/main.py](/applications/template/main.py) script.
