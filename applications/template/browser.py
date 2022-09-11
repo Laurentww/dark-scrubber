@@ -1,5 +1,6 @@
 
 from abc import ABC
+from typing import List
 
 from lib import Browser_base, Puppeteer_base, SeleniumFireFox_base
 
@@ -7,7 +8,7 @@ from lib import Browser_base, Puppeteer_base, SeleniumFireFox_base
 class Browser(Browser_base, ABC):
     """ Base browser class for this application. Ignore if only one browser is used """
 
-    site_data_cur = ''
+    site_data_cur: List[str] = []
 
 
 class Puppeteer(Browser, Puppeteer_base):
@@ -28,7 +29,7 @@ class Puppeteer(Browser, Puppeteer_base):
         # text = await self._get_text(selector)
         # property = await self._get_property(selector, <property_str>)
 
-        self.site_data_cur = ''
+        self.site_data_cur = []
 
 
 class SeleniumFireFox(Browser, SeleniumFireFox_base):
@@ -57,4 +58,4 @@ class SeleniumFireFox(Browser, SeleniumFireFox_base):
         #
         # els = self.browser.find_elements_by_xpath('//button[@aria-label="Close"]')
 
-        self.site_data_cur = ''
+        self.site_data_cur = []
