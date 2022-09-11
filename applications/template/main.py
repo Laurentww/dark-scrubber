@@ -6,6 +6,7 @@ from typing import Union
 from browser import SeleniumFireFox, Puppeteer
 from config_base import ConfigBase
 from lib.scraper import Scraper
+from lib.proxy_utils import co_map
 from mailer import Mailer
 
 
@@ -35,20 +36,17 @@ class Config(ConfigBase):
     }
 
     polling = {
-        'start_h': 8,
-        'end_h': 22,
-        'wait_minutes': 5,
+        'start_h': 10,
+        'end_h': 23,
+        'wait_minutes': 20,
         'bds': 0.5,  # Bounds on wait interval
     }
 
-    driver = 'firefox'  # or 'puppeteer'
+    driver = 'puppeteer'  # or 'puppeteer'
 
     sleep_over_weekend = True
 
-    scraped_text_file = 'site_data.pckl'
-
-    # headless = 'win' not in platform
-    headless = True
+    headless = False
 
     ##################
     #  Proxy Inputs  #
@@ -56,9 +54,7 @@ class Config(ConfigBase):
     use_proxy = False
 
     src_countries = [  # locate proxies from these countries
-        'Germany', 'Netherlands', 'France', 'Denmark', 'United States', 'Austria',
-        'United Kingdom', 'Poland', 'Sweden', 'Finland', 'Norway', 'Spain',
-        'Switzerland'
+        country for country in co_map.keys()
     ]
 
     # Page load timeout [seconds]
@@ -68,8 +64,8 @@ class Config(ConfigBase):
     n_test_workers = 2
 
     working_proxy_limits = {
-        'lower': 10,  # Number of working proxies for new proxies to be imported
-        'upper': 30,  # Number of working proxies for proxy testing to be halted
+        'lower': 15,  # Number of working proxies for new proxies to be imported
+        'upper': 35,  # Number of working proxies for proxy testing to be halted
         'timeout': 60  # Timeout when number of working proxies is below lower threshold
     }
 
@@ -78,14 +74,14 @@ class Config(ConfigBase):
     ban_policy = {
         'last_n': 20,  # Previous n attempts taken into consideration
         'min_n': 5,  # minimum number of tries before proxy may be removed
-        'working_ratio': 0.2  # Working/broken threshold below which proxy is removed
+        'working_ratio': 0.4  # Working/broken threshold below which proxy is removed
     }
 
     # Re-import proxy list if existing import is older than this [seconds]
     import_file_age_thres = 7200
 
     # Update tested proxy file if existing file is older than this [seconds]
-    tested_proxy_file_age_thres = 300
+    tested_proxy_file_age_thres = 1200
 
 
 class TemplateScraper(Scraper):
@@ -93,8 +89,11 @@ class TemplateScraper(Scraper):
     # If debug=True: prints scraped text and mail body to logger. Does not send emails.
     debug = False
 
+    scraped_text_file = 'site_data.pckl'
+
+    # Typing
     config: Config
-    driver: Union[SeleniumFireFox, Puppeteer] = None
+    driver: Union[SeleniumFireFox, Puppeteer]
     mailer: Mailer
 
     def __init__(self):

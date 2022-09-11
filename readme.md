@@ -67,7 +67,8 @@ The scraper sends emails from the supplied email address to itself. For setting 
       - Base scraper class.
 
     - [browser.py](/lib/browser.py)  contains `Browser`, `Puppeteer`, `SeleniumFireFox` classes.
-      - Puppeteer uses Chromium, other uses the FireFox browser of the `selenium` package.
+      - Puppeteer uses Chromium, other uses the FireFox browser of the `selenium` package. 
+      - `puppeteer-stealth` functionality only available when using the Puppeteer browser.
 
     - [proxy.py](/lib/proxy.py)  contains `ProxyRequester` class.
       - Performs proxy-related features.
