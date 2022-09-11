@@ -47,11 +47,8 @@ parser.add_argument(
     "Reduces application size."
 )
 
-icons_subfolder = ('shared', 'icons')
-
 _global_files = {
     sep.join(Mailer.htmls_subfolders): [],  # copy all files in /shared/htmls/*
-    sep.join(icons_subfolder): [],  # copy all files in /shared/icons/*
 }
 _local_files_default = {
     'main': [ua_pckl_file_name] + list(ProxyRequester.filenames.values())
@@ -64,6 +61,9 @@ class PyInstallerBase(ABC):
     _copy_browser_session: bool = False
 
     _app_name_suffix = 'scraper'
+
+    _icons_subfolder_name = 'icons'
+    _icon_file_name = 'scraper2.ico'
 
     def __init__(self, installer_args):
         self._args = installer_args
@@ -104,7 +104,15 @@ class PyInstallerBase(ABC):
 
         copyfile(self._script_caller, _pyinstaller_script_path)
 
-        datas = self._handle_copy_files(_global_files) + self._handle_copy_files()
+        _icon_path_full = (
+            Path(__file__).parent.joinpath(self._icons_subfolder_name)
+            .relative_to(_main_dir).joinpath(self._icon_file_name)
+        )
+        datas = (
+                self._handle_copy_files(_global_files)
+                + self._handle_copy_files()
+                + [(str(_icon_path_full), self._icons_subfolder_name)]
+        )
         make_spec(
             [_script_caller_filename],
             name=self._app_name,
@@ -116,10 +124,9 @@ class PyInstallerBase(ABC):
             # pathex=[],  # additional paths to look for dependencies
             # specpath=str(self._target_dir),
             datas=datas,
-            # icon_file=sep.join(icons_subfolder + ('scraper.ico',)),
-            icon_file=sep.join(icons_subfolder + ('scraper2.ico',)),
+            icon_file=_icon_path_full,
             # resources=[],
-            # hiddenimports=['pyppeteer'],  # does reuire hookspath to be set
+            # hiddenimports=['pyppeteer'],  # does require hookspath to be set
             # collect_submodules=['pyppeteer'],  # does not work
             # hookspath=[],
             # excludes=[],
@@ -144,7 +151,7 @@ class PyInstallerBase(ABC):
         if self._args.onefile:
             # Copy data files separately
             for file_tup in datas:
-                if icons_subfolder[-1] not in file_tup[0]:  # ignore icons
+                if self._icons_subfolder_name not in file_tup[0]:  # ignore icons
                     dest_dir = self._dist_folder_path.joinpath(file_tup[1])
                     makedirs(dest_dir, exist_ok=True)
                     copyfile(file_tup[0], dest_dir.joinpath(file_tup[0].split(sep)[-1]))
